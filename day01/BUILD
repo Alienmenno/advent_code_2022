@@ -6,4 +6,13 @@ cc_test(
     deps = [
         "@gtest//:gtest_main",
     ],
+    data = [":input_files"],
+)
+
+filegroup(
+    name = "input_files",
+    srcs = [
+        "example_input.txt",
+        "puzzle_input.txt",
+    ],
 )
