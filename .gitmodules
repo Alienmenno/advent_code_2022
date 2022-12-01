@@ -1,3 +1,0 @@
-[submodule "thirdparty/cppfront"]
-	path = thirdparty/cppfront
-	url = https://github.com/hsutter/cppfront

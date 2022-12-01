@@ -32,3 +32,11 @@ http_archive(
         "Move-Item -Path support/bazel/WORKSPACE.bazel -Destination WORKSPACE.bazel",
     ],
 )
+
+http_archive(
+    name = "cppfront",
+    url = "https://github.com/hsutter/cppfront/archive/refs/heads/main.zip",
+    sha256 = "aaa56f1618e72f880134515c6a33898e74e92f60b39b3f988cbdc7c54a7643d7",
+    strip_prefix = "cppfront-main",
+    build_file = "@//utils:cppfront.BUILD",
+)
