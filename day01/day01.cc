@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <numeric>
 #include <ranges>
+#include <filesystem>
 
 using FoodItem = int;
 using Snacks = std::vector<FoodItem>;
@@ -16,10 +17,11 @@ struct ElfBackpack {
 
 using ElfGroup = std::vector<ElfBackpack>;
 
-ElfGroup gather_food_items(std::string list_of_food)
+ElfGroup gather_food_items(std::filesystem::path list_of_food)
 {
     std::fstream fs;
-    fs.open(list_of_food);
+    fs.open(list_of_food, std::ios::in);
+    assert(fs.is_open());
 
     ElfGroup elfs{};
     Snacks snacks_for_elf{};
@@ -42,7 +44,7 @@ ElfGroup gather_food_items(std::string list_of_food)
     return elfs;
 }
 
-int find_most_callories(ElfGroup& elfs) {
+int find_most_calories(ElfGroup& elfs) {
     return std::ranges::max(elfs | std::views::transform([](ElfBackpack elf) {
         return std::accumulate(elf.food.begin(), elf.food.end(), 0);
     }));
@@ -59,27 +61,25 @@ int find_top_3_callories(ElfGroup& elfs) {
 }
 
 TEST(Day01, Part1_example) {
+    auto elf_group = gather_food_items("day01/example_input.txt");
 
-    auto elf_group = gather_food_items("example_input.txt");
-
-    ASSERT_EQ(24000, find_most_callories(elf_group));
+    ASSERT_EQ(24000, find_most_calories(elf_group));
 }
 
 TEST(Day01, Part1) {
+    auto elf_group = gather_food_items("day01/puzzle_input.txt");
 
-    auto elf_group = gather_food_items("puzzle_input.txt");
-
-    ASSERT_EQ(72070, find_most_callories(elf_group));
+    ASSERT_EQ(72070, find_most_calories(elf_group));
 }
 
 TEST(Day01, Part2_example) {
-    auto elf_group = gather_food_items("example_input.txt");
+    auto elf_group = gather_food_items("day01/example_input.txt");
 
     ASSERT_EQ(45000, find_top_3_callories(elf_group));
 }
 
 TEST(Day01, Part2) {
-    auto elf_group = gather_food_items("puzzle_input.txt");
+    auto elf_group = gather_food_items("day01/puzzle_input.txt");
 
     ASSERT_EQ(211805, find_top_3_callories(elf_group));
 }
