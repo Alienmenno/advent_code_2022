@@ -1,13 +1,7 @@
 #include "gtest/gtest.h"
-#include <string>
 #include <fstream>
-#include <iostream>
 #include <algorithm>
-#include <numeric>
-#include <ranges>
 #include <filesystem>
-#include <range/v3/all.hpp>
-#include <fmt/format.h>
 #include <fmt/ostream.h>
 #include <fmt/ranges.h>
 
@@ -55,7 +49,7 @@ auto parse_cleaning_jobs(std::filesystem::path cleaning_job_list)
 }
 
 auto check_for_total_overlap(CleaningJobs& jobs) {
-    return ranges::count_if(jobs, [](auto& job_pair) {
+    return std::ranges::count_if(jobs, [](auto& job_pair) {
         return (job_pair.first.min_id <= job_pair.second.min_id
              && job_pair.first.max_id >= job_pair.second.max_id)
             || (job_pair.second.min_id <= job_pair.first.min_id
@@ -64,7 +58,7 @@ auto check_for_total_overlap(CleaningJobs& jobs) {
 }
 
 auto check_for_partial_overlap(CleaningJobs& jobs) {
-    return ranges::count_if(jobs, [](auto& job_pair) {
+    return std::ranges::count_if(jobs, [](auto& job_pair) {
         return !(job_pair.first.max_id < job_pair.second.min_id
               || job_pair.second.max_id < job_pair.first.min_id);
     });
