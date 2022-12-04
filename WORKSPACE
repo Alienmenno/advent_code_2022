@@ -13,3 +13,22 @@ http_archive(
     sha256 = "cbcb96beda464e71d293c07dec89ef5c0790ca83d37b0e199890893019441044",
     strip_prefix = "range-v3-0.12.0",
 )
+
+http_archive(
+    name = "fmt",
+    url = "https://github.com/fmtlib/fmt/archive/refs/tags/9.1.0.zip",
+    sha256 = "cdc885473510ae0ea909b5589367f8da784df8b00325c55c7cbbab3058424120",
+    strip_prefix = "fmt-9.1.0",
+    patch_cmds = [
+        "mv support/bazel/.bazelrc .bazelrc",
+        "mv support/bazel/.bazelversion .bazelversion",
+        "mv support/bazel/BUILD.bazel BUILD.bazel",
+        "mv support/bazel/WORKSPACE.bazel WORKSPACE.bazel",
+    ],
+    patch_cmds_win = [
+        "Move-Item -Path support/bazel/.bazelrc -Destination .bazelrc",
+        "Move-Item -Path support/bazel/.bazelversion -Destination .bazelversion",
+        "Move-Item -Path support/bazel/BUILD.bazel -Destination BUILD.bazel",
+        "Move-Item -Path support/bazel/WORKSPACE.bazel -Destination WORKSPACE.bazel",
+    ],
+)
