@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <ranges>
 #include <regex>
+#include <functional>
 #include <range/v3/all.hpp>
 #include <fmt/ranges.h>
 
@@ -14,16 +15,16 @@ enum OP {
     SQRT
 };
 
-using Items = std::vector<int>;
-using OPS = std::pair<OP, int>;
+using Items = std::vector<unsigned long long>;
+using OPS = std::pair<OP, unsigned long long>;
 
 struct Monkey {
     Items items;
     OPS op;
-    int tv;
-    int t_true;
-    int t_false;
-    uint i_count;
+    unsigned long long tv;
+    unsigned long long t_true;
+    unsigned long long t_false;
+    unsigned long long i_count;
 };
 
 using MonkeyGroup = std::vector<Monkey>;
@@ -100,7 +101,8 @@ auto parse_input(std::filesystem::path cmd_output) {
     return ms;
 }
 
-void monkeying_around(MonkeyGroup &monkeys) {
+template<class Func>
+void monkeying_around(MonkeyGroup &monkeys, Func f, int div) {
     for (auto &m : monkeys) {
         for (auto item : m.items) {
             switch (m.op.first) {
@@ -109,7 +111,7 @@ void monkeying_around(MonkeyGroup &monkeys) {
                 case OP::SQRT: item *= item; break;
                 default: break;
             }
-            item /= 3;
+            item = f(item, div);
             if ((item % m.tv) == 0) monkeys.at(m.t_true).items.push_back(item);
             else monkeys.at(m.t_false).items.push_back(item);
 
@@ -119,13 +121,10 @@ void monkeying_around(MonkeyGroup &monkeys) {
     }
 }
 
-auto check(MonkeyGroup &monkeys, std::size_t n_rounds) {
+template<class Func>
+auto check(MonkeyGroup &monkeys, std::size_t n_rounds, Func f, int div) {
     for (std::size_t i = 0; i < n_rounds; ++i) {
-        monkeying_around(monkeys);
-        fmt::print("Round: {}\n", i);
-        for (auto m : monkeys) {
-            fmt::print("items: {}, i_count: {}\n", m.items, m.i_count);
-        }
+        monkeying_around(monkeys, f, div);
     }
 
     std::ranges::sort(monkeys, [](auto a, auto b){return a.i_count > b.i_count;});
@@ -133,26 +132,34 @@ auto check(MonkeyGroup &monkeys, std::size_t n_rounds) {
     return monkeys.begin()->i_count * (++monkeys.begin())->i_count;
 }
 
+auto det_div(MonkeyGroup &monkeys) {
+    return ranges::accumulate(monkeys, 1, [](int acc, auto m){return acc * m.tv;});
+}
+
 TEST(day11, Part1_example) {
     auto input = parse_input("day11/example_input.txt");
 
-    ASSERT_EQ(10605, check(input, 20));
+    ASSERT_EQ(10605, check(input, 20, std::divides{}, 3));
 }
 
 TEST(day11, Part1) {
     auto input = parse_input("day11/puzzle_input.txt");
     
-    ASSERT_EQ(51075, check(input, 20));
+    ASSERT_EQ(51075, check(input, 20, std::divides{}, 3));
 }
 
 TEST(day11, Part2_example) {
     auto input = parse_input("day11/example_input.txt");
 
-    ASSERT_EQ(2713310158, check(input, 10000));
+    auto div = det_div(input);
+
+    ASSERT_EQ(2713310158, check(input, 10000, std::modulus{}, div));
 }
 
-// TEST(day11, Part2) {
-//     auto input = parse_input("day11/puzzle_input.txt");
+TEST(day11, Part2) {
+    auto input = parse_input("day11/puzzle_input.txt");
     
-//     ASSERT_EQ(10605, check(input));
-// }
+    auto div = det_div(input);
+
+    ASSERT_EQ(11741456163, check(input, 10000, std::modulus{}, div));
+}
